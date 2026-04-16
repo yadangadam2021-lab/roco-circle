@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>洛克圈圈 - 洛克王国：世界 精灵交易社区</title>
+<style>
+:root{
+--gold:#FFD700;
+--mag:#C158DC;
+--gt:#8A8FB0;
+--cyan:#00E5FF;
+--pink:#FF80AB;
+--red:#EF5350;
+--card2:rgba(255,255,255,.06);
+--p3:#4A4CC8;
+--bg:#0F0F2A;
+--bg2:#161638;
+--card:#1C1C48;
+--border:rgba(255,255,255,.08);
+--text:#E8E8F0;
+--text2:#C0C0D8;
+--green:#8CC63F;
+--sky:#42A5F5;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+background:var(--bg);
+color:var(--text);
+max-width:420px;
+margin:0 auto;
+min-height:100vh;
+overflow-x:hidden;
+background-image:
+radial-gradient(ellipse at 20% 0%,rgba(140,198,63,.08) 0%,transparent 60%),
+radial-gradient(ellipse at 80% 100%,rgba(66,165,245,.06) 0%,transparent 60%),
+radial-gradient(ellipse at 50% 50%,rgba(74,76,200,.05) 0%,transparent 70%);
+}
+button{border:none;background:none;cursor:pointer;font:inherit;color:inherit}
+input,select,textarea{font:inherit;color:var(--text);background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;width:100%;outline:none;transition:border .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--p3)}
+textarea{resize:vertical;min-height:60px}
+select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A8FB0' fill='none' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+
+/* Page system */
+.pg{display:none;padding-bottom:24px}
+.pg.on{display:block}
+
+/* Toast */
+.toast{
+position:fixed;top:-60px;left:50%;transform:translateX(-50%);
+background:rgba(28,28,72,.95);color:var(--text);
+padding:12px 24px;border-radius:24px;font-size:14px;font-weight:600;
+z-index:9999;
+border:1px solid rgba(255,215,0,.25);
+box-shadow:0 4px 20px rgba(0,0,0,.4),0 0 15px rgba(255,215,0,.08);
+backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+transition:top .4s cubic-bezier(.2,.8,.3,1);
+white-space:nowrap;max-width:90%;
+}
+.toast.sh{top:40px}
+
+/* Modal overlay */
+.mbg{
+position:fixed;top:0;left:0;width:100%;height:100%;
+background:rgba(0,0,0,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+z-index:8000;display:none;align-items:center;justify-content:center;padding:20px;
+}
+.mbg.sh{display:flex}
+.mbox{
+background:var(--card);border-radius:20px;padding:28px 22px;
+max-width:340px;width:100%;text-align:center;
+border:1px solid var(--border);
+box-shadow:0 12px 40px rgba(0,0,0,.5);
+}
+.mbox h3{font-size:18px;margin-bottom:8px}
+.mbox p{font-size:13px;color:var(--gt);margin-bottom:14px}
+.mbox button{padding:10px 28px;border-radius:20px;font-size:14px;font-weight:bold}
+
+/* Header */
+.hdr{
+display:flex;align-items:center;justify-content:space-between;
+padding:14px 16px;position:sticky;top:0;z-index:100;
+background:rgba(15,15,42,.85);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+border-bottom:1px solid var(--border);
+}
+.ht{font-size:17px;font-weight:bold;text-align:center;flex:1}
+.bk{
+font-size:20px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+border-radius:10px;background:rgba(255,255,255,.06);transition:background .2s;
+}
+.bk:active{background:rgba(255,255,255,.12)}
+
+/* Home banner */
+.hb{
+margin:16px;border-radius:16px;padding:24px 20px;
+display:flex;align-items:center;gap:16px;cursor:pointer;
+box-shadow:0 6px 24px rgba(0,0,0,.3);transition:transform .2s;
+}
+.hb:active{transform:scale(.97)}
+.hi{font-size:48px;filter:drop-shadow(0 0 12px rgba(255,215,0,.4));animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.htx{font-size:20px;font-weight:bold;color:#fff}
+.hsu{font-size:12px;color:rgba(255,255,255,.7);margin-top:4px}
+
+/* Home grid */
+.hg{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px;margin-bottom:12px}
+.hc{
+border-radius:14px;padding:20px 14px;text-align:center;cursor:pointer;
+box-shadow:0 4px 16px rgba(0,0,0,.25);transition:transform .2s;
+}
+.hc:active{transform:scale(.95)}
+.ci{font-size:32px;margin-bottom:6px;display:block}
+.cn{font-size:14px;font-weight:bold;color:#fff}
+
+/* Home wide card */
+.hw{
+margin:0 16px 12px;border-radius:14px;padding:16px 18px;
+display:flex;align-items:center;gap:14px;cursor:pointer;
+border:1px solid var(--border);transition:transform .2s;
+}
+.hw:active{transform:scale(.97)}
+
+/* Home footer tools */
+.hft{padding:0 16px;margin-top:8px}
+.hfc{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.hfi{
+border-radius:12px;padding:14px;text-align:center;font-size:12px;font-weight:600;
+color:var(--text2);cursor:pointer;border:1px solid var(--border);transition:transform .2s;
+}
+.hfi:active{transform:scale(.95)}
+.hfl{display:flex;gap:8px}
+.hfk{
+flex:1;text-align:center;padding:10px 6px;border-radius:10px;font-size:12px;
+font-weight:600;color:var(--text2);background:rgba(255,255,255,.04);
+border:1px solid var(--border);cursor:pointer;transition:background .2s;
+}
+.hfk:active{background:rgba(255,255,255,.08)}
+
+/* Login */
+.lgw{
+display:flex;flex-direction:column;align-items:center;justify-content:center;
+min-height:100vh;padding:32px 24px;text-align:center;
+background:radial-gradient(ellipse at 50% 30%,rgba(74,76,200,.15),transparent 70%);
+}
+.lgl{font-size:72px;margin-bottom:8px;filter:drop-shadow(0 0 24px rgba(255,215,0,.3));animation:float 3s ease-in-out infinite}
+.lgt{font-size:28px;font-weight:bold;margin-bottom:4px}
+.lgs{font-size:14px;color:var(--gt);margin-bottom:36px}
+.lgb{
+display:flex;align-items:center;justify-content:center;gap:10px;
+width:100%;max-width:280px;padding:14px;border-radius:28px;font-size:16px;
+font-weight:bold;color:#fff;margin-bottom:12px;
+box-shadow:0 4px 16px rgba(0,0,0,.25);transition:transform .2s,box-shadow .2s;
+}
+.lgb:active{transform:scale(.96)}
+
+/* Market listing card */
+.mk{
+background:var(--card);border-radius:14px;padding:14px;margin-bottom:12px;
+border:1px solid var(--border);cursor:pointer;
+transition:transform .15s,box-shadow .15s;
+}
+.mk:active{transform:scale(.98)}
+.mt{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.ma{
+width:42px;height:42px;border-radius:50%;
+background:linear-gradient(135deg,rgba(255,215,0,.12),rgba(193,88,220,.12));
+display:flex;align-items:center;justify-content:center;font-size:22px;
+border:2px solid rgba(255,215,0,.2);flex-shrink:0;
+}
+.mi{flex:1;min-width:0}
+.mn{font-size:14px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mh{font-size:11px;color:var(--gt);margin-top:1px}
+.mh span{margin-left:2px;color:var(--gt)}
+.mr{text-align:right;font-size:11px;color:var(--gt);line-height:1.5;flex-shrink:0}
+.md{font-size:13px;color:var(--text2);margin-bottom:10px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mts{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.tg{
+display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;
+white-space:nowrap;
+}
+.mb{display:flex;align-items:center;justify-content:space-between}
+.mp{display:flex;align-items:center;gap:6px}
+.lb{
+display:inline-block;font-size:11px;font-weight:bold;color:#fff;
+padding:2px 8px;border-radius:6px;
+}
+.vl{font-size:16px;font-weight:bold;color:var(--gold)}
+.mc{
+font-size:12px;font-weight:600;color:var(--cyan);
+padding:6px 12px;border-radius:18px;
+background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.15);
+transition:background .2s;
+}
+.mc:active{background:rgba(0,229,255,.18)}
+
+/* Filter bar */
+.fb{
+display:flex;align-items:center;gap:6px;padding:10px 16px;
+position:sticky;top:49px;z-index:90;
+background:rgba(15,15,42,.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+}
+.fbn{
+padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;
+background:rgba(255,255,255,.06);color:var(--text2);transition:all .2s;
+border:1px solid transparent;white-space:nowrap;
+}
+.fbn.on{
+background:linear-gradient(135deg,var(--p3),var(--mag));
+color:#fff;border-color:transparent;
+box-shadow:0 2px 10px rgba(74,76,200,.3);
+}
+.fsl{
+padding:6px 28px 6px 10px;border-radius:20px;font-size:13px;
+background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text2);
+min-width:0;flex-shrink:1;
+}
+
+/* FAB (Floating Action Button) */
+.fab{position:fixed;bottom:24px;right:max(16px,calc((100vw - 420px)/2 + 16px));z-index:200;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.fabm{
+width:54px;height:54px;border-radius:50%;
+background:linear-gradient(135deg,var(--p3),var(--mag));
+font-size:24px;color:#fff;
+box-shadow:0 4px 20px rgba(74,76,200,.5),0 0 20px rgba(193,88,220,.2);
+transition:transform .3s;display:flex;align-items:center;justify-content:center;
+}
+.fabm:active{transform:scale(.9) rotate(45deg)}
+.fabmn{
+display:flex;flex-direction:column;gap:8px;
+opacity:0;transform:translateY(10px) scale(.9);pointer-events:none;
+transition:all .25s cubic-bezier(.2,.8,.3,1);
+}
+.fabmn.sh{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.fbi{
+padding:10px 18px;border-radius:14px;font-size:13px;font-weight:600;
+background:var(--card);border:1px solid var(--border);white-space:nowrap;
+box-shadow:0 4px 16px rgba(0,0,0,.3);cursor:pointer;transition:transform .15s;
+}
+.fbi:active{transform:scale(.95)}
+
+/* Toggle button group */
+.tgb{display:flex;gap:0;margin:12px 16px;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:var(--bg2)}
+.tgb button{flex:1;padding:12px;font-size:14px;font-weight:bold;color:var(--gt);transition:all .2s;background:transparent}
+.tgb button.on{background:linear-gradient(135deg,var(--p3),var(--mag));color:#fff}
+
+/* Form group */
+.fg{padding:0 16px;margin-bottom:12px}
+.fg label{display:block;font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px}
+.fg select,.fg input,.fg textarea{width:100%}
+
+/* Button base */
+.bt{
+display:block;width:100%;padding:14px;border-radius:28px;font-size:16px;font-weight:bold;
+text-align:center;transition:transform .2s,box-shadow .2s;
+}
+.bt:active{transform:scale(.96)}
+.btg{
+background:linear-gradient(135deg,var(--green),var(--gold));
+color:#1A1A3E;
+box-shadow:0 4px 18px rgba(140,198,63,.3);
+}
+
+/* Grouped section (attribute/trade info panels) */
+.gs{
+margin:12px 16px;padding:16px;border-radius:14px;
+background:var(--card);border:1px solid var(--border);
+}
+.gs h4{font-size:15px;font-weight:bold;margin-bottom:12px;color:var(--text)}
+.gr{
+display:flex;align-items:center;padding:8px 0;
+border-bottom:1px solid var(--border);font-size:13px;
+}
+.gr:last-child{border-bottom:none}
+.gl{color:var(--gt);min-width:72px;flex-shrink:0}
+.gv{flex:1;text-align:right;word-break:break-all}
+
+/* Empty state */
+.es{
+text-align:center;padding:48px 20px;color:var(--gt);font-size:15px;line-height:2;
+}
+.ei{font-size:48px;margin-bottom:8px;display:block}
+
+/* Profile card */
+.pfc{
+margin:16px;padding:20px;border-radius:16px;
+background:var(--card);border:1px solid var(--border);
+}
+.pfav{text-align:center;margin-bottom:16px}
+.pac{
+width:80px;height:80px;border-radius:50%;
+background:linear-gradient(135deg,rgba(255,215,0,.15),rgba(193,88,220,.15));
+border:3px solid rgba(255,215,0,.3);
+display:flex;align-items:center;justify-content:center;font-size:40px;
+margin:0 auto 8px;
+}
+.pah{font-size:12px;color:var(--gt)}
+
+/* Emoji selector */
+.emos{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:16px}
+.emo{
+width:44px;height:44px;border-radius:12px;
+display:flex;align-items:center;justify-content:center;font-size:24px;
+background:rgba(255,255,255,.04);border:2px solid transparent;cursor:pointer;
+transition:all .2s;
+}
+.emo:active{transform:scale(.9)}
+.emo.on{border-color:var(--gold);background:rgba(255,215,0,.1);box-shadow:0 0 10px rgba(255,215,0,.15)}
+
+/* Profile form row */
+.pfr{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.pfl{font-size:13px;font-weight:600;color:var(--gt);min-width:60px;flex-shrink:0}
+.pfr input,.pfr select{flex:1}
+
+/* Price chart bar */
+.bar{
+height:8px;border-radius:4px;
+transition:width .6s cubic-bezier(.2,.8,.3,1);
+min-width:15%;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}
+
+/* Tap highlight removal */
+*{-webkit-tap-highlight-color:transparent}
+</style></head><body>
+<div class="toast" id="T"></div>
+<div class="mbg" id="MB"><div class="mbox" id="MX"></div></div>
+<div id="p-home" class="pg on"></div>
+<div id="p-login" class="pg"></div>
+<div id="p-market" class="pg"></div>
+<div id="p-pub" class="pg"></div>
+<div id="p-det" class="pg"></div>
+<div id="p-profile" class="pg"></div>
+<div id="p-price" class="pg"></div>
+<div id="p-mypub" class="pg"></div>
+<script>
+const P=[{n:'迪莫',e:'✨',t:'光',r:'传说'},{n:'火神',e:'🔥',t:'火',r:'稀有'},{n:'雪影娃娃',e:'⛄',t:'冰',r:'稀有'},{n:'水灵',e:'💧',t:'水',r:'普通'},{n:'极光千兽',e:'🦁',t:'光',r:'传说'},{n:'冰龙王',e:'🐉',t:'冰',r:'传说'},{n:'翼龙',e:'🦅',t:'飞行',r:'稀有'},{n:'音速犬',e:'🐕',t:'普通',r:'普通'},{n:'多多',e:'🐣',t:'草',r:'普通'},{n:'瞌睡王',e:'😴',t:'普通',r:'稀有'}];
+const SVR=['梦幻服','星辰服','彩虹服','魔法服'];
+const NAT=['开朗','固执','保守','胆小','温和','天真','调皮','爽朗'];
+const ETP=['普通蛋','异色蛋','炫彩蛋','完美蛋'];
+const NKS=['洛克小天才','精灵猎人Rex','蛋蛋大师','异色收藏家','王国探险者','魔法学徒','星辰猎手','彩虹旅人'];
+function ri(a){return a[~~(Math.random()*a.length)]}
+function gp(n){const p=P.find(x=>x.n===n);return p?p.e:'🥚'}
+function $(s){return document.querySelector(s)}function $$(s){return document.querySelectorAll(s)}
+function ta(ts){const d=Date.now()-ts,m=~~(d/6e4),h=~~(d/36e5);return m<1?'刚刚':m<60?m+'分钟前':h<24?h+'小时前':~~(h/24)+'天前'}
+function toast(m){const t=$('#T');t.textContent=m;t.classList.add('sh');setTimeout(()=>t.classList.remove('sh'),2e3)}
+function showM(h){$('#MX').innerHTML=h;$('#MB').classList.add('sh')}
+function hideM(){$('#MB').classList.remove('sh')}
+const DB={u:null,users:[],ls:[],
+ld(){this.users=JSON.parse(localStorage.getItem('ru')||'[]');this.ls=JSON.parse(localStorage.getItem('rl')||'[]');const uid=localStorage.getItem('ri');if(uid)this.u=this.users.find(x=>x.id===uid);if(!this.ls.length)this.seed()},
+sv(){localStorage.setItem('ru',JSON.stringify(this.users));localStorage.setItem('rl',JSON.stringify(this.ls));if(this.u)localStorage.setItem('ri',this.u.id)},
+seed(){for(let i=0;i<18;i++){const p=ri(P),s=Math.random()>.35,pt=Math.random()>.4?'蛋':'成体',nm=ri(NKS);
+this.ls.push({id:'L'+Date.now()+i,tp:s?'sell':'buy',pn:p.n,pe:p.e,pt,et:pt==='蛋'?ri(ETP):'',tl:~~(Math.random()*10)+1,nt:ri(NAT),sk:p.t+'系技能·'+['烈焰冲击','冰霜新星','光之守护','暗影突袭','疾风斩','治愈之光','雷霆万钧','自然之力'][~~(Math.random()*8)],pr:['500洛克贝','1200洛克贝','面议','2000洛克贝','800洛克贝','3500洛克贝','价高者得'][~~(Math.random()*7)],ds:s?['品质优良欢迎咨询~','急出！诚心出不刀','亲代资质好，潜力大','练好了直接上场的水平'][~~(Math.random()*4)]:['急求！有的私聊','高价收完美蛋，微信联系','求一只天分8以上的，价格好说','收异色，品相好的来'][~~(Math.random()*4)],si:'N'+i,sn:nm,sa:p.e,sv:ri(SVR),ct:{wx:'wx_'+nm.substring(0,4)+~~(Math.random()*999),qq:String(1e8+~~(Math.random()*9e8)),uid:'UID'+~~(Math.random()*9e6)},tm:Date.now()-~~(Math.random()*864e5),dl:Date.now()+[864e5,2592e5,6048e5][~~(Math.random()*3)],st:'active',ht:~~(Math.random()*5)+1,tc:~~(Math.random()*150)})}
+this.sv()}};
+DB.ld();
+let cp='home',fabOpen=false;
+function go(p,d){$$('.pg').forEach(x=>x.classList.remove('on'));$('#p-'+p).classList.add('on');cp=p;scrollTo(0,0);fabOpen=false;const fm=$('.fabmn');if(fm)fm.classList.remove('sh');if(R[p])R[p](d)}
+function tFab(){fabOpen=!fabOpen;$('.fabmn').classList.toggle('sh',fabOpen)}
+function rl(){if(!DB.u){go('login');toast('✨ 请先登录');return false}return true}
+const R={};
+
+R.home=function(){const cnt=DB.ls.filter(l=>l.st==='active').length;
+$('#p-home').innerHTML=`<div class="hdr"><div class="ht">🏰 洛克圈圈</div></div>
+<div class="hb" style="background:linear-gradient(135deg,#2B2D8B,#4A4CC8)" onclick="go('market')"><div class="hi">✨</div><div><div class="htx">精灵交易广场</div><div class="hsu">当前${cnt}条活跃供需 · 快速找到交易伙伴</div></div></div>
+<div class="hg">
+<div class="hc" style="background:linear-gradient(135deg,#1A237E,#3949AB)" onclick="go('market','buy')"><div class="ci">🥚</div><div class="cn">精灵求购</div></div>
+<div class="hc" style="background:linear-gradient(135deg,#4A148C,#7B1FA2)" onclick="go('market','sell')"><div class="ci">🔮</div><div class="cn">精灵出手</div></div>
+<div class="hc" style="background:linear-gradient(135deg,#004D40,#00796B)" onclick="if(rl())go('profile')"><div class="ci">👤</div><div class="cn">我的档案</div></div>
+<div class="hc" style="background:linear-gradient(135deg,#E65100,#FF8F00)" onclick="go('price')"><div class="ci">📖</div><div class="cn">精灵图鉴</div></div>
+</div>
+<div class="hw" style="background:var(--card2)" onclick="go('price')"><div style="font-size:32px">📊</div><div><div style="font-weight:bold">精灵行情参考</div><div style="font-size:12px;color:var(--gt);margin-top:2px">实时热门精灵价格 · 交易趋势</div></div></div>
+<div class="hft">
+<div class="hfc">
+<div class="hfi" style="background:rgba(255,215,0,.08)" onclick="toast('天赋计算器开发中~')"><div style="font-size:20px;margin-bottom:4px">💎</div>天赋计算</div>
+<div class="hfi" style="background:rgba(0,229,255,.08)" onclick="toast('交易攻略整理中~')"><div style="font-size:20px;margin-bottom:4px">🗺️</div>交易攻略</div>
+</div>
+<div class="hfl">
+<div class="hfk" onclick="toast('微信群：洛克交易圈 (搜索加入)')">💬 微信群</div>
+<div class="hfk" onclick="toast('QQ群：888666999')">👥 QQ群</div>
+<div class="hfk" onclick="toast('洛克圈圈 v1.0 — 精灵交易信息平台')">ℹ️ 关于</div>
+</div>
+</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gt)">洛克圈圈 · 精灵交易信息撮合平台<br>不直接参与交易，仅提供信息展示与玩家建联服务</div>`};
+
+R.login=function(){$('#p-login').innerHTML=`<div class="lgw">
+<div class="lgl">🏰</div><div class="lgt">洛克圈圈</div><div class="lgs">洛克王国：世界 精灵交易社区</div>
+<button class="lgb" style="background:linear-gradient(135deg,#07C160,#06AD56)" onclick="doLogin('微信')"><span style="font-size:22px">💚</span> 微信登录</button>
+<button class="lgb" style="background:linear-gradient(135deg,#12B7F5,#0D8BD9)" onclick="doLogin('QQ')"><span style="font-size:22px">💙</span> QQ登录</button>
+<button style="background:none;color:var(--gt);font-size:14px;margin-top:16px;padding:10px" onclick="doLogin('游客')">游客体验 →</button>
+<div style="margin-top:32px;font-size:12px;color:var(--gt)">登录即表示同意《用户协议》与《隐私政策》</div>
+</div>`};
+function doLogin(t){const nm=t==='游客'?'洛克旅人'+~~(Math.random()*9e3+1e3):t+'用户'+~~(Math.random()*9e3+1e3);
+const u={id:'U'+Date.now(),nm,sv:ri(SVR),uid:'UID'+~~(Math.random()*9e6),wx:t==='微信'?'wx_'+nm:'',qq:t==='QQ'?String(1e8+~~(Math.random()*9e8)):'',av:ri(P).e,ht:0,tr:0,ct:[]};
+DB.users.push(u);DB.u=u;DB.sv();toast('✨ 欢迎，'+nm+'！');go('home')}
+
+R.market=function(f){let tf='all',pf='',sb='time';
+if(f==='sell')tf='sell';if(f==='buy')tf='buy';if(typeof f==='string'&&!['sell','buy'].includes(f))pf=f;
+function rr(){let it=DB.ls.filter(l=>l.st==='active');if(tf==='sell')it=it.filter(l=>l.tp==='sell');if(tf==='buy')it=it.filter(l=>l.tp==='buy');if(pf)it=it.filter(l=>l.pn.includes(pf));if(sb==='time')it.sort((a,b)=>b.tm-a.tm);if(sb==='pa')it.sort((a,b)=>parseFloat(a.pr)-parseFloat(b.pr));
+const pns=[...new Set(DB.ls.map(l=>l.pn))];
+let lh=it.map(l=>{
+const rr2=l.r||P.find(p=>p.n===l.pn)?.r||'';
+const rc={'传说':'background:rgba(255,215,0,.2);color:var(--gold)','稀有':'background:rgba(193,88,220,.2);color:var(--mag)','普通':'background:rgba(255,255,255,.1);color:var(--gt)'};
+const hts='❤️'.repeat(Math.min(l.ht||1,5));
+return `<div class="mk" onclick="go('det','${l.id}')">
+<div class="mt"><div class="ma">${l.sa||gp(l.pn)}</div><div class="mi"><div class="mn">${l.sn}</div><div class="mh">${hts}<span>(${l.tc||0})</span></div></div><div class="mr">${l.sv||''}<br>${ta(l.tm)}</div></div>
+<div class="md">${l.ds}</div>
+<div class="mts"><span class="tg" style="background:rgba(0,229,255,.15);color:var(--cyan)">${gp(l.pn)} ${l.pn}</span><span class="tg" style="background:rgba(255,128,171,.15);color:var(--pink)">${l.pt==='蛋'?'🥚'+l.et:'🐾成体'}</span><span class="tg" style="background:rgba(179,136,255,.15);color:#B388FF">天分${l.tl}级</span>${rr2?`<span class="tg" style="${rc[rr2]||''}">${rr2}</span>`:''}</div>
+<div class="mb"><div class="mp"><span class="lb" style="background:${l.tp==='sell'?'#EF5350':'#42A5F5'}">${l.tp==='sell'?'卖':'求'}</span><span class="vl">${l.pr}</span></div><button class="mc">查看详情 →</button></div></div>`}).join('');
+if(!it.length)lh='<div class="es"><div class="ei">🔍</div>暂无匹配供需</div>';
+$('#p-market').innerHTML=`<div class="hdr"><button class="bk" onclick="go('home')">←</button><div class="ht">✨ 精灵交易广场</div><div style="width:30px"></div></div>
+<div class="fb"><button class="fbn ${tf==='all'?'on':''}" onclick="tf='all';rr()">全部</button><button class="fbn ${tf==='sell'?'on':''}" onclick="tf='sell';rr()">出售</button><button class="fbn ${tf==='buy'?'on':''}" onclick="tf='buy';rr()">求购</button>
+<select class="fsl" onchange="pf=this.value;rr()"><option value="">全部精灵</option>${pns.map(n=>`<option value="${n}" ${pf===n?'selected':''}>${gp(n)} ${n}</option>`).join('')}</select></div>
+<div style="padding:0 16px">${lh}</div>
+<div class="fab"><div class="fabmn" id="fabMenu">
+<div class="fbi" onclick="if(rl()){go('pub','sell')}">🏷️ 发布出售</div>
+<div class="fbi" onclick="if(rl()){go('pub','buy')}">📢 发布求购</div>
+<div class="fbi" onclick="if(rl()){go('mypub')}">📋 我的发布</div>
+<div class="fbi" onclick="if(rl()){go('profile')}">👤 我的档案</div>
+</div><button class="fabm" onclick="tFab()">⚡</button></div>`;
+window.tf=tf;window.pf=pf;window.sb=sb;window.rr=rr}rr()};
+
+R.pub=function(m){let pt=m==='buy'?'buy':'sell';
+function rr(){$('#p-pub').innerHTML=`<div class="hdr"><button class="bk" onclick="go('market')">←</button><div class="ht">发布信息</div><div style="width:30px"></div></div>
+<div class="tgb"><button class="${pt==='sell'?'on':''}" onclick="pt='sell';rr()">🏷️ 出售</button><button class="${pt==='buy'?'on':''}" onclick="pt='buy';rr()">📢 求购</button></div>
+<div class="fg"><label>✨ 精灵品种</label><select id="fPet"><option value="">请选择精灵</option>${P.map(p=>`<option value="${p.n}">${p.e} ${p.n} (${p.r})</option>`).join('')}</select></div>
+<div class="fg"><label>🥚 交易类型</label><select id="fPt"><option value="蛋">精灵蛋</option><option value="成体">成体精灵</option></select></div>
+<div class="fg"><label>蛋类型 (精灵蛋时选择)</label><select id="fEt">${ETP.map(e=>`<option>${e}</option>`).join('')}</select></div>
+<div style="display:flex;gap:10px;padding:0 16px;margin-bottom:12px">
+<div class="fg" style="flex:1;margin:0"><label>天分等级</label><select id="fTl">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option>${n}</option>`).join('')}</select></div>
+<div class="fg" style="flex:1;margin:0"><label>性格</label><select id="fNt">${NAT.map(n=>`<option>${n}</option>`).join('')}</select></div>
+</div>
+<div class="fg"><label>⚔️ 技能描述</label><textarea id="fSk" placeholder="如：火系·烈焰冲击 + 光系·圣光护盾"></textarea></div>
+<div class="fg"><label>💰 ${pt==='sell'?'出售价格':'期望价格'}</label><input id="fPr" placeholder="如：1500洛克贝 或 面议"></div>
+<div class="fg"><label>📝 补充说明</label><textarea id="fDs" placeholder="${pt==='sell'?'品质优良，亲代资质好...':'急求，价格好商量...'}"></textarea></div>
+<div class="fg"><label>⏰ 有效期</label><select id="fDl"><option value="1">1天</option><option value="3" selected>3天</option><option value="7">7天</option></select></div>
+${DB.u?`<div class="gs"><h4>📱 联系方式 (自动来自您的档案)</h4>${DB.u.wx?`<div class="gr"><span class="gl">微信</span><span class="gv">${DB.u.wx}</span></div>`:''}${DB.u.qq?`<div class="gr"><span class="gl">QQ</span><span class="gv">${DB.u.qq}</span></div>`:''}<div class="gr"><span class="gl">游戏UID</span><span class="gv">${DB.u.uid||'未填写'}</span></div></div>`:''}
+<div style="padding:0 16px;margin-top:4px"><button class="bt btg" onclick="doPub('${pt}')">✨ 发布</button></div>`;
+window.pt=pt;window.rr=rr}rr()};
+function doPub(tp){if(!rl())return;const pet=$('#fPet').value,ptype=$('#fPt').value,et=$('#fEt').value,tl=parseInt($('#fTl').value),nt=$('#fNt').value,sk=$('#fSk').value,pr=$('#fPr').value,ds=$('#fDs').value,dl=parseInt($('#fDl').value);
+if(!pet)return toast('请选择精灵品种');if(!pr)return toast('请填写价格');
+const p=P.find(x=>x.n===pet),u=DB.u;
+DB.ls.unshift({id:'L'+Date.now(),tp,pn:pet,pe:p.e,pt:ptype,et:ptype==='蛋'?et:'',tl,nt,sk:sk||p.t+'系技能',pr,ds:ds||'',si:u.id,sn:u.nm,sa:u.av,sv:u.sv,ct:{wx:u.wx,qq:u.qq,uid:u.uid},tm:Date.now(),dl:Date.now()+dl*864e5,st:'active',ht:u.ht||1,tc:u.tr||0,r:p.r});
+DB.sv();toast('✨ 发布成功！');go('market')}
+
+R.det=function(id){const l=DB.ls.find(x=>x.id===id);if(!l)return;
+const p=P.find(x=>x.n===l.pn)||{};
+const rc={'传说':'color:var(--gold)','稀有':'color:var(--mag)','普通':'color:var(--gt)'};
+$('#p-det').innerHTML=`<div class="hdr"><button class="bk" onclick="go('market')">←</button><div class="ht">精灵详情</div><div style="width:30px"></div></div>
+<div style="text-align:center;padding:30px 16px 20px;background:linear-gradient(180deg,rgba(74,76,200,.2),transparent)">
+<div style="font-size:80px;filter:drop-shadow(0 0 20px rgba(255,215,0,.4))">${l.pe||gp(l.pn)}</div>
+<div style="font-size:22px;font-weight:bold;margin-top:8px">${l.pn}</div>
+<div style="margin-top:6px"><span class="tg" style="padding:4px 14px;background:${l.tp==='sell'?'rgba(239,83,80,.2)':'rgba(66,165,245,.2)'};color:${l.tp==='sell'?'var(--red)':'#42A5F5'}">${l.tp==='sell'?'🏷️ 出售':'📢 求购'}</span>
+${p.r?`<span class="tg" style="padding:4px 14px;${rc[p.r]||''};background:rgba(255,255,255,.08)">${p.r}</span>`:''}</div>
+<div style="font-size:28px;font-weight:bold;color:var(--gold);margin-top:12px">${l.pr}</div></div>
+<div class="gs"><h4>📋 精灵属性</h4>
+<div class="gr"><span class="gl">品种</span><span class="gv">${l.pe} ${l.pn}</span></div>
+<div class="gr"><span class="gl">属性</span><span class="gv">${p.t||'未知'}系</span></div>
+<div class="gr"><span class="gl">类型</span><span class="gv">${l.pt==='蛋'?'🥚 精灵蛋':'🐾 成体精灵'}</span></div>
+${l.et?`<div class="gr"><span class="gl">蛋类型</span><span class="gv">${l.et}</span></div>`:''}
+<div class="gr"><span class="gl">天分等级</span><span class="gv">⭐ ${l.tl}级</span></div>
+<div class="gr"><span class="gl">性格</span><span class="gv">${l.nt||'未知'}</span></div>
+<div class="gr"><span class="gl">技能</span><span class="gv">${l.sk||'未知'}</span></div></div>
+<div class="gs"><h4>💬 交易信息</h4>
+<div class="gr"><span class="gl">补充说明</span><span class="gv">${l.ds||'无'}</span></div>
+<div class="gr"><span class="gl">有效期至</span><span class="gv">${new Date(l.dl).toLocaleDateString()}</span></div>
+<div class="gr"><span class="gl">发布时间</span><span class="gv">${ta(l.tm)}</span></div></div>
+<div class="gs"><h4>👤 发布者</h4>
+<div style="display:flex;align-items:center;gap:12px">
+<div style="width:48px;height:48px;border-radius:50%;background:rgba(255,215,0,.12);border:2px solid rgba(255,215,0,.25);display:flex;align-items:center;justify-content:center;font-size:24px">${l.sa||gp(l.pn)}</div>
+<div><div style="font-weight:bold;font-size:16px">${l.sn}</div><div style="font-size:12px;color:var(--gt);margin-top:2px">${l.sv} · ${Array(Math.min(l.ht||1,5)).fill('❤️').join('')}(${l.tc||0}笔)</div></div></div></div>
+<div style="padding:16px"><button class="bt btg" onclick="showContact('${l.id}')">✨ 查看联系方式</button>
+<div style="text-align:center;margin-top:10px;font-size:12px;color:var(--gt)">获取联系方式后，请在游戏内或微信/QQ自行联系交易</div></div>`};
+function showContact(id){if(!rl())return;const l=DB.ls.find(x=>x.id===id);if(!l||!l.ct)return;
+let info='';if(l.ct.wx)info+=`<div class="gr"><span class="gl">微信</span><span class="gv">${l.ct.wx}</span></div>`;
+if(l.ct.qq)info+=`<div class="gr"><span class="gl">QQ</span><span class="gv">${l.ct.qq}</span></div>`;
+if(l.ct.uid)info+=`<div class="gr"><span class="gl">游戏UID</span><span class="gv">${l.ct.uid}</span></div>`;
+if(!DB.u.ct)DB.u.ct=[];if(!DB.u.ct.includes(id)){DB.u.ct.push(id);DB.sv()}
+showM(`<h3>📱 联系方式</h3><p>请添加对方好友后，在游戏内完成交易</p><div style="text-align:left">${info}</div><div style="margin-top:16px"><button style="background:linear-gradient(135deg,var(--p3),var(--mag));color:#fff" onclick="hideM()">知道了</button></div>`)}
+
+R.profile=function(){if(!rl())return;const u=DB.u;
+$('#p-profile').innerHTML=`<div class="hdr"><button class="bk" onclick="go('home')">←</button><div class="ht">🪪 我的档案</div><div style="width:30px"></div></div>
+<div class="pfc">
+<div class="pfav"><div class="pac" id="avDisp">${u.av||'🧑'}</div><div class="pah">点击下方精灵更换头像</div></div>
+<div class="emos" id="emoSel">${P.map(p=>`<div class="emo ${u.av===p.e?'on':''}" onclick="selAv('${p.e}')">${p.e}</div>`).join('')}</div>
+<div class="pfr"><div class="pfl">昵称</div><input id="pfNm" value="${u.nm}" placeholder="输入昵称"></div>
+<div class="pfr"><div class="pfl">服务器</div><select id="pfSv">${SVR.map(s=>`<option ${u.sv===s?'selected':''}>${s}</option>`).join('')}</select></div>
+<div class="pfr"><div class="pfl">游戏UID</div><input id="pfUid" value="${u.uid||''}" placeholder="输入游戏内UID"></div>
+<div class="pfr"><div class="pfl">微信号</div><input id="pfWx" value="${u.wx||''}" placeholder="输入微信号 (选填)"></div>
+<div class="pfr"><div class="pfl">QQ号</div><input id="pfQq" value="${u.qq||''}" placeholder="输入QQ号 (选填)"></div>
+<button style="display:block;margin:20px auto 0;padding:12px 48px;background:linear-gradient(135deg,#B8860B,#FFD700);color:#1A1A3E;border-radius:24px;font-size:16px;font-weight:bold" onclick="savePf()">✨ 保存</button>
+</div>
+<div style="padding:16px;text-align:center"><button style="background:none;color:var(--red);font-size:14px;padding:10px" onclick="DB.u=null;localStorage.removeItem('ri');toast('已退出');go('home')">退出登录</button></div>`};
+function selAv(e){DB.u.av=e;DB.sv();$$('.emo').forEach(x=>x.classList.toggle('on',x.textContent===e));$('#avDisp').textContent=e}
+function savePf(){const u=DB.u;u.nm=$('#pfNm').value.trim()||u.nm;u.sv=$('#pfSv').value;u.uid=$('#pfUid').value.trim();u.wx=$('#pfWx').value.trim();u.qq=$('#pfQq').value.trim();DB.sv();toast('✨ 档案已保存！');go('home')}
+
+R.price=function(){const stats={};DB.ls.filter(l=>l.st==='active').forEach(l=>{if(!stats[l.pn])stats[l.pn]={cnt:0,tot:0,e:l.pe};stats[l.pn].cnt++;const n=parseInt(l.pr);if(n)stats[l.pn].tot+=n});
+const rows=Object.entries(stats).sort((a,b)=>b[1].cnt-a[1].cnt);const mx=Math.max(...rows.map(([,v])=>v.tot/v.cnt||0),1);
+$('#p-price').innerHTML=`<div class="hdr"><button class="bk" onclick="go('home')">←</button><div class="ht">📊 精灵行情参考</div><div style="width:30px"></div></div>
+<div style="display:flex;gap:8px;padding:8px 16px;flex-wrap:wrap">${['传说','稀有','普通'].map(r=>{const c=r==='传说'?'var(--gold)':r==='稀有'?'var(--mag)':'var(--gt)';return`<span style="padding:6px 16px;border-radius:20px;font-size:13px;font-weight:bold;background:rgba(255,255,255,.08);color:${c};border:1px solid ${c}">${r}</span>`}).join('')}</div>
+<div class="gs"><h4>📈 热门精灵均价排行</h4>${rows.map(([n,v])=>{const avg=v.cnt?~~(v.tot/v.cnt):0;const w=avg?~~(avg/mx*100):30;
+return`<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>${v.e} ${n}</span><span style="color:var(--gold)">${avg||'面议'} · ${v.cnt}条</span></div><div class="bar" style="width:${Math.max(w,15)}%;background:linear-gradient(90deg,var(--p3),var(--mag))"></div></div>`}).join('')}</div>
+<div class="gs"><h4>📖 精灵图鉴</h4>${P.map(p=>{const rc={'传说':'var(--gold)','稀有':'var(--mag)','普通':'var(--gt)'};
+return`<div class="gr"><span style="font-size:20px;margin-right:6px">${p.e}</span><span>${p.n}</span><span class="gl" style="margin-left:4px">${p.t}系</span><span style="margin-left:auto;color:${rc[p.r]||'var(--gt)'};font-weight:bold">${p.r}</span></div>`}).join('')}</div>`};
+
+R.mypub=function(){if(!rl())return;const my=DB.ls.filter(l=>l.si===DB.u.id);
+let lh=my.map(l=>`<div class="mk" onclick="go('det','${l.id}')"><div class="mt"><div class="ma">${l.pe||gp(l.pn)}</div><div class="mi"><div class="mn">${l.pn}</div><div style="font-size:12px;color:var(--gt)">${l.tp==='sell'?'出售':'求购'} · ${ta(l.tm)}</div></div><div class="mr"><span style="color:var(--gold)">${l.pr}</span></div></div></div>`).join('');
+if(!my.length)lh='<div class="es"><div class="ei">📋</div>暂无发布<br><span style="font-size:13px">去交易广场发布供需吧~</span></div>';
+$('#p-mypub').innerHTML=`<div class="hdr"><button class="bk" onclick="go('market')">←</button><div class="ht">📋 我的发布</div><div style="width:30px"></div></div><div style="padding:0 16px">${lh}</div>`};
+
+go('home');
+</script></body></html>
